@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <meta property="og:title" content="Pagomigo - Send Money Fast and Securely">
+  <meta property="og:description" content="The digital wallet for the Hispanic world. Send and receive money with Pagomigo.">
+  <meta property="og:image" content="pagomigodisplayimage.png">
+  <meta property="og:url" content="https://www.pagomigo.com/moneymover.html">
+  <meta property="og:type" content="website">
+    <title>Money Mover | Pagomigo</title>
+    <link rel="stylesheet" href="moneymover.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header class="main-header">
+    <div class="logo">
+      <a href="home.html"><img src="pagomigologo.png" alt="Pagomigo Logo" width="100"></a>
+    </div>
+    <img src="menuicon.svg" alt="Menu" class="hamburger" id="hamburger" />
+  </header>
+
+  <nav class="slideout-menu" id="slideoutMenu">
+    <img src="closeicon.svg" alt="Close" class="close-btn" id="closeMenu" />
+    <ul>
+      <li><a href="dashboard.html">Dashboard</a></li>
+      <li><a href="moneymover.html">Send / Request</a></li>
+      <li><a href="home.html">Home</a></li>
+      <li><a href="#">Settings</a></li>
+      <li><a href="login.html">Login</a></li>
+      <li><a href="billpay.html">Bill Pay</a></li>
+    </ul>
+  </nav>
+
+  <main class="money-mover">
+    <div class="tabs">
+      <button id="sendTab" class="active">Send Money</button>
+      <button id="requestTab">Request Money</button>
+    </div>
+
+    <section id="sendSection" class="form-section">
+      <h2>Send Money</h2>
+      <form id="sendForm">
+        <input type="text" name="recipientName" placeholder="Recipient Phone" required>
+        <input type="text" name="recipientCountry" placeholder="Country Code (e.g., MX)" required>
+        <input type="number" name="amountUsd" placeholder="Amount in USD" required>
+        <button type="submit">Send</button>
+      </form>
+    </section>
+
+    <section id="requestSection" class="form-section hidden">
+      <h2>Request Money</h2>
+      <form id="requestForm">
+        <input type="text" id="requestedFrom" name="requestedFrom" placeholder="Username or Phone" required>
+        <input type="text" name="requestNote" placeholder="Reason / Note" required>
+        <input type="number" name="amountUsd" placeholder="Amount in USD" required>
+        <button type="submit">Request</button>
+      </form>
+    </section>
+  </main>
+    <footer class="site-footer">
+    <div class="footer-row footer-logo">
+      <img src="pagomigologo.png" alt="Pagomigo Logo" width="100" />
+    </div>
+  
+    <div class="footer-row footer-links">
+      <a href="#">Terms & Conditions</a>
+      <a href="#">Privacy Policy</a>
+    </div>
+  
+    <div class="footer-row footer-copy">
+      <p>&copy; 2025 Pagomigo.com L.L.C. All rights reserved.</p>
+    </div>
+  </footer>
+    <script src="moneymover.js"></script>
+</body>
+</html>

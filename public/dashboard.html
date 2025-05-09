@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <meta property="og:title" content="Pagomigo - Send Money Fast and Securely">
+  <meta property="og:description" content="The digital wallet for the Hispanic world. Send and receive money with Pagomigo.">
+  <meta property="og:image" content="pagomigodisplayimage.png">
+  <meta property="og:url" content="https://www.pagomigo.com/dashboard.html">
+  <meta property="og:type" content="website">
+  <title>My Dashboard - Pagomigo</title>
+  <link rel="stylesheet" href="dashboard.css">
+  <link rel="stylesheet" href="index.css">
+</head>
+<body>
+    <header class="main-header">
+        <div class="logo"><a href="home.html"><img src="pagomigologo.png" id="logo" alt="pagomigologo"></a>
+        </div>
+        <img src="menuicon.svg" alt="Menu" class="hamburger" id="hamburger" />
+      </header>
+    
+      <nav class="slideout-menu" id="slideoutMenu">
+        <img src="closeicon.svg" alt="Close" class="close-btn" id="closeMenu" />
+        <ul>
+          <li><a href="dashboard.html">Dashboard</a></li>
+          <li><a href="moneymover.html">Send/Request Money</a></li>
+          <li><a href="home.html">Home</a></li>
+          <li><a href="#">Settings</a></li>
+          <li><a href="login.html">Login</a></li>
+          <li><a href="billpay.html">Bill Pay</a></li>
+        </ul>
+      </nav>
+  </header>
+
+  <main class="dashboard">
+    <section class="user-info">
+      <h2><span id="user-name">User</span></h2>
+      <p>Phone: <span id="user-phone">+1...</span></p>
+      <p>Email: <span id="user-email">Email</span></p>
+      <p>Address: <span id="user-address">Address</span></p>
+      <p>KYC Status: <span id="user-kyc">pending</span></p>
+      <p>Account Balance: <span id="user-balance">$0.00</span></p>
+      
+      <div class="editprofilebtn">
+        <button id="openEditProfileModal">Edit Profile</button>
+      </div>
+    </section>
+
+    <section class="transactions">
+      <h3>Recent Transactions</h3>
+      <ul id="transaction-list">
+        <!-- Populated by JS -->
+      </ul>
+    </section>
+  
+    <section class="requests">
+      <h3>Incoming Requests</h3>
+      <ul id="request-list">
+        <!-- Populated by JS -->
+      </ul>
+    </section>
+  </main>
+
+  <section class="dashboardmodal">
+     
+  <div id="editProfileModal" class="modal hidden">
+    <div class="modal-content">
+      <span class="close-profile-modal">&times;</span>
+      <h2>Edit Profile</h2>
+      <form id="editProfileForm">
+        <input type="text" id="edit-name" placeholder="Full Name" required />
+        <input type="text" id="edit-username" placeholder="Username" required />
+        <input type="email" id="edit-email" placeholder="Email" required />
+        <input type="text" id="edit-phone" placeholder="Phone Number" required />
+        <input type="text" id="edit-address" placeholder="Address" required />
+        <button type="submit">Save Changes</button>
+      </form>
+    </div>
+  </div>
+  </section>
+
+  <footer class="site-footer">
+    <div class="footer-row footer-logo">
+      <img src="pagomigologo.png" alt="Pagomigo Logo" width="100" />
+    </div>
+  
+    <div class="footer-row footer-links">
+      <a href="#">Terms & Conditions</a>
+      <a href="#">Privacy Policy</a>
+    </div>
+  
+    <div class="footer-row footer-copy">
+      <p>&copy; 2025 Pagomigo.com L.L.C. All rights reserved.</p>
+    </div>
+  </footer>
+  <script src="dashboard.js"></script>
+</body>
+</html>
