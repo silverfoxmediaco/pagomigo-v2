@@ -217,9 +217,9 @@ body {
 }
 
 /* Hide by default, will be shown based on KYC status */
-.kyc-banner {
+/*.kyc-banner {
   display: none;
-}
+}*/
 
 
     /* Footer Styles */
