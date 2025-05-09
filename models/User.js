@@ -29,6 +29,11 @@ const userSchema = new mongoose.Schema({
     required: true,
     minlength: 6
   },
+  address: {
+    type: String,
+    required: false,
+    trim: true
+  },
     kyc_status: {
     type: String,
     enum: ['completed', 'failed', 'pending'],
