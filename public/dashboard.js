@@ -78,6 +78,23 @@ async function loadDashboard() {
       balanceEl.textContent = `$${balance.toFixed(2)}`;
     }
 
+    // KYC banner logic - moved inside the loadDashboard function
+    const kycBanner = document.getElementById('kyc-banner');
+    if (kycBanner) {
+      if (profile.kyc_status === 'approved' || profile.kyc_status === 'pending_review') {
+        kycBanner.style.display = 'none';
+      } else {
+        kycBanner.style.display = 'block';
+        // Event listener for KYC button
+        const startKycBtn = document.getElementById('start-kyc-btn');
+        if (startKycBtn) {
+          startKycBtn.addEventListener('click', function() {
+            window.location.href = 'kyc.html';
+          });
+        }
+      }
+    }
+
     const txRes = await fetch(`${API_BASE}/api/transactions/history`, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
