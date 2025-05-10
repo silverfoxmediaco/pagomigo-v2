@@ -132,6 +132,41 @@ body {
     display: none;
   }
 
+    .kyc-warning-banner {
+  background-color: #fff3cd;
+  border-left: 4px solid #ffc107;
+  color: #856404;
+  padding: 15px;
+  margin-bottom: 20px;
+  border-radius: 5px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.kyc-warning-banner p {
+  margin: 0;
+  padding-right: 15px;
+}
+
+.kyc-warning-banner .primary-btn {
+  background-color: #0562ff;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 5px;
+  font-weight: bold;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+/* Style for disabled buttons */
+button[disabled] {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
     /* Footer Styles */
 .site-footer {
     background-color: #f5f7fa;
