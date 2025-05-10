@@ -89,7 +89,7 @@ async function loadDashboard() {
         const startKycBtn = document.getElementById('start-kyc-btn');
         if (startKycBtn) {
           startKycBtn.addEventListener('click', function() {
-            window.location.href = 'kyc.html';
+            window.location.href = 'identity-verification.html';
           });
         }
       }
