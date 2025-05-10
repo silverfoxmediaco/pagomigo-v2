@@ -1,103 +1,95 @@
-// moneymover.js
-
-const API_BASE = 'https://pagomigo.com';
-
-const sendTab = document.getElementById('sendTab');
-const requestTab = document.getElementById('requestTab');
-const sendSection = document.getElementById('sendSection');
-const requestSection = document.getElementById('requestSection');
-const sendForm = document.getElementById('sendForm');
-const requestForm = document.getElementById('requestForm');
-
-sendTab.addEventListener('click', () => {
-  sendTab.classList.add('active');
-  requestTab.classList.remove('active');
-  sendSection.classList.remove('hidden');
-  requestSection.classList.add('hidden');
+// Add this near the top of your file, after the API_BASE declaration
+document.addEventListener('DOMContentLoaded', function() {
+  // Check KYC status when page loads
+  checkKycStatus();
+  
+  // Rest of your existing initialization code can stay...
 });
 
-requestTab.addEventListener('click', () => {
-  requestTab.classList.add('active');
-  sendTab.classList.remove('active');
-  requestSection.classList.remove('hidden');
-  sendSection.classList.add('hidden');
-});
-
-// Send Money form submit
-sendForm.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const token = localStorage.getItem('token');
-
-  const formData = new FormData(sendForm);
-  const data = {
-    recipientUserName: formData.get('recipientUserName'),
-    recipientPhone: formData.get('recipientPhone'),
-    recipientCountry: formData.get('recipientCountry'),
-    amountUsd: formData.get('amountUsd'),
-  };
-
+// Add these new functions for KYC handling
+async function checkKycStatus() {
   try {
-    const res = await fetch(`${API_BASE}/api/transactions/send`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`
-      },
-      body: JSON.stringify(data)
+    const token = localStorage.getItem('token');
+    if (!token) {
+      window.location.href = 'login.html';
+      return;
+    }
+    
+    const res = await fetch(`${API_BASE}/api/user/profile`, {
+      headers: { 'Authorization': `Bearer ${token}` }
     });
-
-    const result = await res.json();
-    alert(result.message || 'Money sent!');
-    sendForm.reset();
+    
+    if (res.ok) {
+      const user = await res.json();
+      const kycStatus = user.kyc_status || 'pending';
+      localStorage.setItem('kycStatus', kycStatus);
+      
+      // Check if KYC is approved
+      if (kycStatus !== 'approved') {
+        // Add warning banner at the top
+        addKycWarningBanner();
+        
+        // Disable send/request buttons if not approved
+        disableTransactionButtons();
+      }
+    }
   } catch (error) {
-    console.error('Send money error:', error);
-    alert('Failed to send money.');
+    console.error('Error checking KYC status:', error);
   }
-});
-
-// Request Money
-requestForm.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const token = localStorage.getItem('token');
-
-  const formData = new FormData(requestForm);
-  const data = {
-    requestNote: formData.get('requestNote'),
-    amountUsd: formData.get('amountUsd'),
-  };
-
-  try {
-    const res = await fetch(`${API_BASE}/api/requests`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`
-      },
-      body: JSON.stringify(data)
-    });
-
-    const result = await res.json();
-    alert(result.message || 'Request sent!');
-    requestForm.reset();
-  } catch (error) {
-    console.error('Request money error:', error);
-    alert('Failed to send request.');
-  }
-});
-
-// Burger menu logic
-const hamburger = document.getElementById("hamburger");
-const slideoutMenu = document.getElementById("slideoutMenu");
-const closeBtn = document.getElementById("closeMenu");
-
-if (hamburger) {
-  hamburger.addEventListener("click", () => {
-    slideoutMenu.classList.add("open");
-  });
 }
 
-if (closeBtn) {
-  closeBtn.addEventListener("click", () => {
-    slideoutMenu.classList.remove("open");
-  });
+function addKycWarningBanner() {
+  // Create warning banner
+  const banner = document.createElement('div');
+  banner.className = 'kyc-warning-banner';
+  banner.innerHTML = `
+    <p>Your identity verification is required before you can send or request money.</p>
+    <button id="verify-identity-btn" class="primary-btn">Verify Identity</button>
+  `;
+  
+  // Insert at the top of the main content
+  const mainContent = document.querySelector('.moneymover-container') || document.querySelector('main');
+  if (mainContent) {
+    mainContent.insertBefore(banner, mainContent.firstChild);
+    
+    // Add event listener to the button
+    document.getElementById('verify-identity-btn').addEventListener('click', function() {
+      redirectToKyc('transaction');
+    });
+  }
+}
+
+function disableTransactionButtons() {
+  // Disable send form submit button
+  const sendButton = sendForm.querySelector('button[type="submit"]');
+  if (sendButton) {
+    sendButton.disabled = true;
+    sendButton.title = 'Identity verification required';
+    sendButton.addEventListener('click', function(e) {
+      e.preventDefault();
+      redirectToKyc('send');
+    });
+  }
+  
+  // Disable request form submit button
+  const requestButton = requestForm.querySelector('button[type="submit"]');
+  if (requestButton) {
+    requestButton.disabled = true;
+    requestButton.title = 'Identity verification required';
+    requestButton.addEventListener('click', function(e) {
+      e.preventDefault();
+      redirectToKyc('request');
+    });
+  }
+}
+
+function redirectToKyc(action) {
+  // Store the intended action to return to after KYC
+  localStorage.setItem('pendingAction', action);
+  
+  // Show a friendly message
+  alert('To keep your account secure, we need to verify your identity before you can send or receive money. Let\'s complete this quick process now!');
+  
+  // Redirect to KYC page
+  window.location.href = 'identity-verification.html';
 }
