@@ -142,6 +142,20 @@ app.post('/api/persona/complete-verification', authenticateUser, async (req, res
     
     console.log(`Updating user ${userId} KYC status to "approved"`);
     
+    const updatedUser = await User.findByIdAndUpdate(userId, 
+      {
+      kyc_status: 'approved',
+      persona_inquiry_id: inquiryId,
+      kyc_updated_at: new Date()
+    }, 
+    { new: true });
+
+    if (!updatedUser) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    console.log('User KYC status updated:', updatedUser);
+    
+
     // Return success response
     res.json({
       status: 'approved',
