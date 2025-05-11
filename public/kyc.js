@@ -1,41 +1,7 @@
 // kyc.js
 const API_BASE = '';
 
-// Function to dynamically load Persona SDK
-function loadPersonaSDK() {
-  return new Promise((resolve, reject) => {
-    if (window.Persona) {
-      console.log("Persona SDK already loaded");
-      return resolve(window.Persona);
-    }
-    
-    console.log("Attempting to load Persona SDK dynamically");
-    const script = document.createElement('script');
-    script.src = 'https://cdn.withpersona.com/dist/persona-v4.js';
-    script.async = true;
-    
-    script.onload = () => {
-      console.log("Persona SDK loaded successfully");
-      resolve(window.Persona);
-    };
-    
-    script.onerror = (err) => {
-      console.error("Failed to load Persona SDK:", err);
-      reject(new Error("Failed to load Persona SDK"));
-    };
-    
-    document.head.appendChild(script);
-  });
-}
-
-document.addEventListener('DOMContentLoaded', async function() {
-  // Try to load Persona SDK
-  try {
-    await loadPersonaSDK();
-  } catch (error) {
-    console.error("Error loading Persona SDK:", error);
-  }
-
+document.addEventListener('DOMContentLoaded', function() {
   const token = localStorage.getItem('token');
   
   if (!token) {
@@ -119,22 +85,10 @@ function showView(viewId) {
 async function initiatePersona() {
   try {
     // Check if Persona SDK is loaded
-    if (!window.Persona || !window.Persona.Client) {
+    if (!window.Persona) {
       console.error('Persona SDK not loaded');
-      
-      // Try to load it dynamically as a fallback
-      try {
-        await loadPersonaSDK();
-      } catch (sdkError) {
-        alert('The identity verification service is not available. Please refresh the page and try again.');
-        return;
-      }
-      
-      // Double-check after loading attempt
-      if (!window.Persona || !window.Persona.Client) {
-        alert('The identity verification service is not available. Please refresh the page and try again.');
-        return;
-      }
+      alert('The identity verification service is not available. Please refresh the page and try again.');
+      return;
     }
     
     // Get the current user's information
@@ -156,9 +110,10 @@ async function initiatePersona() {
     const referenceId = user._id.toString ? user._id.toString() : String(user._id);
     console.log('User reference ID for Persona:', referenceId);
 
-    const client = new window.Persona.Client({
+    // Use Persona.Client directly (without window) and add environmentId
+    const client = new Persona.Client({
       templateId: 'itmpl_pFWFRbSWT9CJkEnSBiAQVdUa6dY6', 
-      environment: 'sandbox', // Use 'production' for live environment
+      environmentId: 'env_wXtScja9z97vjkVtQvd6GoTdBPKU', // This should be your actual environment ID
       referenceId: referenceId, // User's unique identifier
       onReady: () => {
         console.log('Persona is ready');
@@ -177,12 +132,8 @@ async function initiatePersona() {
       }
     });
     
-    // Start the verification process
-    client.open({
-      name: user.name,
-      emailAddress: user.email,
-      phoneNumber: user.phone
-    });
+    // Just call open() without parameters
+    client.open();
     
   } catch (error) {
     console.error('Error initiating Persona:', error);
