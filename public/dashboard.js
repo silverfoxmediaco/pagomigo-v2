@@ -44,6 +44,7 @@ async function loadDashboard() {
     console.log('User profile data:', profile);
 
     // Get all the elements we need to update
+    const kycBanner = document.getElementById('kyc-banner'); // Moved up here
     const nameEl = document.getElementById('user-name');
     const phoneEl = document.getElementById('user-phone');
     const emailEl = document.getElementById('user-email');
@@ -70,16 +71,16 @@ async function loadDashboard() {
     }
     
     if (kycEl) {
-      kycEl.textContent = profile.kyc_status || profile.kycStatus || 'pending';
+      const kycStatus = profile.kyc_status || profile.kycStatus || 'pending';
       const statusDisplay = {
         'pending': 'Pending',
         'approved': 'Approved',
         'rejected': 'Rejected',
         'pending_review': 'Under Review'
       };
-      kycEl.textContent = statusDisplay[profile.kyc_status] || 'Pending';
+      kycEl.textContent = statusDisplay[kycStatus] || 'Pending';
       kycEl.className = '';
-      kycBanner.classList.add(`status-${kycstatus}`);
+      kycEl.classList.add(`status-${kycStatus}`); // Fixed to use correct variable and element
     }
     
     if (balanceEl) {
@@ -87,10 +88,10 @@ async function loadDashboard() {
       balanceEl.textContent = `$${balance.toFixed(2)}`;
     }
 
-    // KYC banner logic - moved inside the loadDashboard function
-    const kycBanner = document.getElementById('kyc-banner');
+    // KYC banner logic
     if (kycBanner) {
-      if (profile.kyc_status === 'approved' || profile.kyc_status === 'pending_review') {
+      const kycStatus = profile.kyc_status || profile.kycStatus || 'pending';
+      if (kycStatus === 'approved' || kycStatus === 'pending_review') {
         kycBanner.style.display = 'none';
       } else {
         kycBanner.style.display = 'block';
@@ -98,7 +99,7 @@ async function loadDashboard() {
         const startKycBtn = document.getElementById('start-kyc-btn');
         if (startKycBtn) {
           startKycBtn.addEventListener('click', function() {
-            window.location.href = 'kyc.html';
+            window.location.href = 'identity-verification.html'; // Changed from kyc.html
           });
         }
       }
