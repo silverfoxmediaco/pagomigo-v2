@@ -167,3 +167,70 @@ async function initiatePersona() {
         console.log('Verification completed:', { inquiryId, status });
         await completeVerification(inquiryId);
       },
+      onCancel: () => {
+        showView('kyc-intro');
+      },
+      onError: (error) => {
+        console.error('Persona error:', error);
+        alert('There was an error with the verification process. Please try again.');
+        showView('kyc-intro');
+      }
+    });
+    
+    // Start the verification process
+    client.open({
+      name: user.name,
+      emailAddress: user.email,
+      phoneNumber: user.phone
+    });
+    
+  } catch (error) {
+    console.error('Error initiating Persona:', error);
+    alert('Unable to start the verification process. Please try again later.');
+    showView('kyc-intro');
+  }
+}
+
+async function completeVerification(inquiryId) {
+  try {
+    const token = localStorage.getItem('token');
+    const res = await fetch(`${API_BASE}/api/persona/complete-verification`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ inquiryId })
+    });
+    
+    if (!res.ok) {
+      throw new Error('Failed to complete verification');
+    }
+    
+    // Update local KYC status
+    localStorage.setItem('kycStatus', 'pending_review');
+    
+    // Show completion screen
+    showView('kyc-complete');
+  } catch (error) {
+    console.error('Error completing verification:', error);
+    alert('There was an issue submitting your verification. Please contact support.');
+  }
+}
+
+function returnToDashboard() {
+  const pendingAction = localStorage.getItem('pendingAction');
+  
+  if (pendingAction) {
+    localStorage.removeItem('pendingAction');
+    if (pendingAction === 'send') {
+      window.location.href = 'moneymover.html?action=send';
+    } else if (pendingAction === 'request') {
+      window.location.href = 'moneymover.html?action=request';
+    } else {
+      window.location.href = 'dashboard.html';
+    }
+  } else {
+    window.location.href = 'dashboard.html';
+  }
+}
