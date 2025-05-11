@@ -71,6 +71,15 @@ async function loadDashboard() {
     
     if (kycEl) {
       kycEl.textContent = profile.kyc_status || profile.kycStatus || 'pending';
+      const statusDisplay = {
+        'pending': 'Pending',
+        'approved': 'Approved',
+        'rejected': 'Rejected',
+        'pending_review': 'Under Review'
+      };
+      kycEl.textContent = statusDisplay[profile.kyc_status] || 'Pending';
+      kycEl.className = '';
+      kycBanner.classList.add(`status-${kycstatus}`);
     }
     
     if (balanceEl) {
@@ -89,7 +98,7 @@ async function loadDashboard() {
         const startKycBtn = document.getElementById('start-kyc-btn');
         if (startKycBtn) {
           startKycBtn.addEventListener('click', function() {
-            window.location.href = 'identity-verification.html';
+            window.location.href = 'kyc.html';
           });
         }
       }
