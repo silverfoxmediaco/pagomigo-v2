@@ -157,12 +157,21 @@ async function completeVerification(inquiryId) {
     if (!res.ok) {
       throw new Error('Failed to complete verification');
     }
+
+    const result = await res.json();
+    console.log('Verification result:', result);
     
-    // Update local KYC status
-    localStorage.setItem('kycStatus', 'pending_review');
+    // Update local KYC status based on the response
+    const newStatus = result.status || 'pending_review';
+    localStorage.setItem('kycStatus', newStatus);
     
     // Show completion screen
     showView('kyc-complete');
+    
+    // After 2 seconds, redirect to dashboard
+    setTimeout(() => {
+      window.location.href = 'dashboard.html?verification=complete';
+    }, 2000);
   } catch (error) {
     console.error('Error completing verification:', error);
     alert('There was an issue submitting your verification. Please contact support.');
