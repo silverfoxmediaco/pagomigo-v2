@@ -100,10 +100,13 @@ async function initiatePersona() {
     showView('persona-container');
     
     // Initialize Persona client
+    const referenceId = user._id.toString ? user._id.toString() : String(user._id);
+    console.log('User reference ID for Persona:', referenceId);
+
     const client = new window.Persona.Client({
-      templateId: 'tmpl_ckBmQRSU7VCGgDcSZAkPVYB4', // Replace with your actual template ID
+      templateId: 'itmpl_pFWFRbSWT9CJkEnSBiAQVdUa6dY6', 
       environment: 'sandbox', // Use 'production' for live environment
-      referenceId: user._id, // User's unique identifier
+      referenceId: referenceId, // User's unique identifier
       onReady: () => {
         console.log('Persona is ready');
       },
