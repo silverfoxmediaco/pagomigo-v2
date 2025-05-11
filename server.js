@@ -30,6 +30,32 @@ console.log('CORS enabled');
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Raw body saver for Persona webhooks
+function rawBodySaver(req, res, buf) {
+  req.rawBody = buf.toString();
+}
+
+// Authentication middleware
+function authenticateUser(req, res, next) {
+  // Get token from header
+  const token = req.headers.authorization?.split(' ')[1];
+  
+  if (!token) {
+    return res.status(401).json({ message: 'No authentication token, access denied' });
+  }
+  
+  try {
+    // This is a placeholder - replace with your actual token verification
+    // For example: const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    // For now, just mock a user for testing
+    req.user = { id: 'user_123' };
+    next();
+  } catch (error) {
+    console.error('Token verification failed:', error);
+    res.status(401).json({ message: 'Token is not valid' });
+  }
+}
+
 // Serve static files
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -83,33 +109,11 @@ app.get('/api/ping', (req, res) => {
   res.json({ message: 'Pagomigo API is alive!' });
 });
 
-// Fallback to frontend for all other routes
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
-
-// Connect to MongoDB Atlas
-mongoose.connect(process.env.MONGO_URI, {})
-  .then(() => console.log('MongoDB connected'))
-  .catch(err => console.error('MongoDB error:', err));
-
-//WehookHandler for Persona
+// Persona Webhook Handler
 const { handlePersonaWebhook } = require('./persona/webhookHandler');
 app.post('/api/persona/webhook', express.json({ verify: rawBodySaver }), handlePersonaWebhook);
-function rawBodySaver(req, res, buf) {
-  req.rawBody = buf.toString();
-}
+
 // Handle Persona inquiry creation
-// Persona integration endpoints
-
-// 1. Webhook handler (you already have this)
-const { handlePersonaWebhook } = require('./persona/webhookHandler');
-app.post('/api/persona/webhook', express.json({ verify: rawBodySaver }), handlePersonaWebhook);
-function rawBodySaver(req, res, buf) {
-  req.rawBody = buf.toString();
-}
-
-// 2. Handle Persona inquiry creation
 app.post('/api/persona/create-inquiry', authenticateUser, async (req, res) => {
   try {
     const { referenceId, redirectUrl } = req.body;
@@ -127,6 +131,7 @@ app.post('/api/persona/create-inquiry', authenticateUser, async (req, res) => {
   }
 });
 
+// Handle verification completion
 app.post('/api/persona/complete-verification', authenticateUser, async (req, res) => {
   try {
     const { inquiryId } = req.body;
@@ -149,7 +154,7 @@ app.post('/api/persona/complete-verification', authenticateUser, async (req, res
   }
 });
 
-// 4. Get verification status
+// Get verification status
 app.get('/api/persona/verification-status', authenticateUser, async (req, res) => {
   try {
     const userId = req.user.id; 
@@ -166,6 +171,15 @@ app.get('/api/persona/verification-status', authenticateUser, async (req, res) =
   }
 });
 
+// Fallback to frontend for all other routes
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+// Connect to MongoDB Atlas
+mongoose.connect(process.env.MONGO_URI, {})
+  .then(() => console.log('MongoDB connected'))
+  .catch(err => console.error('MongoDB error:', err));
 
 // Start the server
 const PORT = process.env.PORT || 3000;
