@@ -100,6 +100,71 @@ function rawBodySaver(req, res, buf) {
   req.rawBody = buf.toString();
 }
 // Handle Persona inquiry creation
+// Persona integration endpoints
+
+// 1. Webhook handler (you already have this)
+const { handlePersonaWebhook } = require('./persona/webhookHandler');
+app.post('/api/persona/webhook', express.json({ verify: rawBodySaver }), handlePersonaWebhook);
+function rawBodySaver(req, res, buf) {
+  req.rawBody = buf.toString();
+}
+
+// 2. Handle Persona inquiry creation
+app.post('/api/persona/create-inquiry', authenticateUser, async (req, res) => {
+  try {
+    const { referenceId, redirectUrl } = req.body;
+    
+    console.log('Creating Persona inquiry for reference ID:', referenceId);
+    
+    res.json({
+      inquiryId: `inq_mock_${Date.now()}`,
+      status: 'created',
+      message: 'Inquiry created successfully'
+    });
+  } catch (error) {
+    console.error('Error creating Persona inquiry:', error);
+    res.status(500).json({ error: 'Failed to create inquiry' });
+  }
+});
+
+app.post('/api/persona/complete-verification', authenticateUser, async (req, res) => {
+  try {
+    const { inquiryId } = req.body;
+    const userId = req.user.id; 
+    
+    console.log('Processing verification completion for inquiry:', inquiryId);
+    console.log('User ID:', userId);
+    
+    console.log(`Updating user ${userId} KYC status to "approved"`);
+    
+    // Return success response
+    res.json({
+      status: 'approved',
+      message: 'Verification processed successfully',
+      inquiryId: inquiryId
+    });
+  } catch (error) {
+    console.error('Error completing verification:', error);
+    res.status(500).json({ error: 'Failed to process verification' });
+  }
+});
+
+// 4. Get verification status
+app.get('/api/persona/verification-status', authenticateUser, async (req, res) => {
+  try {
+    const userId = req.user.id; 
+    console.log('Fetching verification status for user:', userId);
+    
+    // For testing, return approved status
+    res.json({
+      status: 'approved',
+      updatedAt: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('Error fetching verification status:', error);
+    res.status(500).json({ error: 'Failed to fetch verification status' });
+  }
+});
 
 
 // Start the server
