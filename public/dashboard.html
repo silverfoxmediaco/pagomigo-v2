@@ -69,6 +69,99 @@
         <!-- Populated by JS -->
       </ul>
     </section>
+
+    <!-- Banking Section -->
+    <section id="banking" class="banking-section">
+  <div class="section-header">
+    <h3>Banking</h3>
+    <div class="balance-info">
+      <span class="balance-label">Unit Balance:</span>
+      <span id="unit-balance" class="balance-amount">$0.00</span>
+    </div>
+  </div>
+  
+  <div class="banking-actions">
+    <button id="send-money-trigger" class="banking-btn primary-btn">
+      <img src="sendicon.svg" alt="Send" class="btn-icon">
+      Send Money
+    </button>
+    <button id="request-money-trigger" class="banking-btn secondary-btn">
+      <img src="requesticon.svg" alt="Request" class="btn-icon">
+      Request Money
+    </button>
+    <button id="deposit-trigger" class="banking-btn secondary-btn">
+      <img src="depositicon.svg" alt="Deposit" class="btn-icon">
+      Deposit
+    </button>
+  </div>
+  
+  <!-- Send Money Form Panel (Initially Hidden) -->
+  <div id="send-money-panel" class="action-panel hidden">
+    <div class="panel-header">
+      <h4>Send Money</h4>
+      <button class="close-panel">&times;</button>
+    </div>
+    <form id="send-money-form">
+      <div class="form-group">
+        <label for="receiver-input">To</label>
+        <input id="receiver-input" type="text" placeholder="Phone or email" required>
+      </div>
+      <div class="form-group">
+        <label for="amount-input">Amount</label>
+        <div class="amount-input-wrapper">
+          <span class="currency-symbol">$</span>
+          <input id="amount-input" type="number" min="0.01" step="0.01" placeholder="0.00" required>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="note-input">Note (Optional)</label>
+        <input id="note-input" type="text" placeholder="What's it for?">
+      </div>
+      <div class="form-actions">
+        <div id="send-error-message" class="error-message hidden"></div>
+        <button id="send-button" type="submit" class="primary-btn">Send Money</button>
+      </div>
+    </form>
+  </div>
+  
+  <!-- Request Money Form Panel (Initially Hidden) -->
+  <div id="request-money-panel" class="action-panel hidden">
+    <div class="panel-header">
+      <h4>Request Money</h4>
+      <button class="close-panel">&times;</button>
+    </div>
+    <form id="request-money-form">
+      <div class="form-group">
+        <label for="request-from-input">From</label>
+        <input id="request-from-input" type="text" placeholder="Phone or email" required>
+      </div>
+      <div class="form-group">
+        <label for="request-amount-input">Amount</label>
+        <div class="amount-input-wrapper">
+          <span class="currency-symbol">$</span>
+          <input id="request-amount-input" type="number" min="0.01" step="0.01" placeholder="0.00" required>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="request-note-input">Note (Optional)</label>
+        <input id="request-note-input" type="text" placeholder="What's it for?">
+      </div>
+      <div class="form-actions">
+        <div id="request-error-message" class="error-message hidden"></div>
+        <button id="request-button" type="submit" class="primary-btn">Request Money</button>
+      </div>
+    </form>
+  </div>
+  
+  <!-- Account Setup Notice (Shown if no Unit account) -->
+  <div id="no-account-message" class="no-account-container hidden">
+    <h4>Set Up Your Banking Account</h4>
+    <p>You need to set up a Unit banking account to send and receive money directly.</p>
+    <button id="setup-account-btn" class="primary-btn">Set Up Account</button>
+  </div>
+</section>
+
+
   </main>
 
   <section class="dashboardmodal">
