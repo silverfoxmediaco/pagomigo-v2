@@ -33,6 +33,80 @@ h2 {
   text-decoration: underline;
 }
 
+/*retail section*/
+.retailsection {
+  margin: 40px auto;
+  padding: 20px;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  max-width: 1200px;
+  animation: fadeInUp 0.5s ease-in-out;
+}
+
+.retail-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: 30px;
+  margin: 30px auto;
+  padding: 10px;
+}
+
+.retailitem {
+  position: relative;
+  transition: transform 0.3s ease;
+  cursor: pointer;
+}
+
+.retailimagecontainer {
+  background-color: white;
+  border-radius: 8px;
+  overflow: hidden;
+  width: 100%;
+  aspect-ratio: 1/1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.coffeemaker, .dogbed, .sneakers, .gameconsole, .newtires, .newwatch {
+  width: 80%;
+  height: 80%;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+}
+
+.retailitem-shadow {
+  height: 4px;
+  background: linear-gradient(to bottom, rgba(0, 51, 204, 0.2), transparent);
+  opacity: 0.5;
+  margin-top: 8px;
+  margin-left: 20%;
+  margin-right: 20%;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.retailitem:hover {
+  transform: translateY(-10px);
+}
+
+.retailitem:hover .coffeemaker,
+.retailitem:hover .dogbed,
+.retailitem:hover .sneakers,
+.retailitem:hover .gameconsole,
+.retailitem:hover .newtires,
+.retailitem:hover .newwatch {
+  transform: scale(1.1);
+}
+
+.retailitem:hover .retailitem-shadow {
+  opacity: 0.7;
+  margin-top: 15px;
+  margin-left: 15%;
+  margin-right: 15%;
+}
 
 /* Debit Card Section Styles */
 .debit-card-section {
@@ -404,5 +478,14 @@ h2 {
         gap: 20px;
       }
 
-  }
+        .retail-grid {
+          grid-template-columns: 1fr;
+          grid-template-rows: repeat(6, 1fr);
+        }
+
+      }
+      
+      
+
+  
   
