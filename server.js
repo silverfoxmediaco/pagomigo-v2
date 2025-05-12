@@ -5,13 +5,27 @@ const express = require('express');
 const path = require('path');
 const cors = require('cors');
 const mongoose = require('mongoose');
-const jwt = require('jsonwebtoken'); // Add JWT library
-const User = require('./models/User'); // Add User model
+const jwt = require('jsonwebtoken');
+const User = require('./models/User');
+
+// Route imports
 const authRoutes = require('./routes/authRoutes');
 const personaRoutes = require('./persona/personaRoutes');
 const userRoutes = require('./routes/userRoutes');
 const transactionRoutes = require('./routes/transactionRoutes');
 const requestRoutes = require('./routes/requestRoutes');
+
+// Unit.co integration imports
+const unitRoutes = require('./routes/unitRoutes');
+const unit = require('./config/unit');
+const unitAccountRoutes = require('./routes/unitAccountRoutes');
+const unitTransactionRoutes = require('./routes/unitTransactionRoutes');
+const unitWebhookRoutes = require('./routes/unitWebhookRoutes');
+const { unitWebhookMiddleware, rawBodySaver: unitRawBodySaver } = require('./middleware/unitWebhook');
+
+// Persona imports
+const { handlePersonaWebhook } = require('./persona/webhookHandler');
+
 const isProd = process.env.NODE_ENV === 'production';
 
 const app = express();
@@ -32,12 +46,12 @@ console.log('CORS enabled');
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Raw body saver for Persona webhooks
+// Raw body saver for webhooks
 function rawBodySaver(req, res, buf) {
   req.rawBody = buf.toString();
 }
 
-// Authentication middleware with proper JWT verification
+// Authentication middleware with JWT verification
 function authenticateUser(req, res, next) {
   // Get token from header
   const token = req.headers.authorization?.split(' ')[1];
@@ -100,23 +114,22 @@ app.use((req, res, next) => {
   next();
 });
 
-// API routes
-app.use('/api/auth', authRoutes);
-app.use('/api/persona', personaRoutes);
-app.use('/api/user', userRoutes);
-app.use('/api/transactions', transactionRoutes);
-app.use('/api/requests', requestRoutes);
-
 // Health check
 app.get('/api/ping', (req, res) => {
   res.json({ message: 'Pagomigo API is alive!' });
 });
 
-// Persona Webhook Handler
-const { handlePersonaWebhook } = require('./persona/webhookHandler');
+// API Routes
+app.use('/api/auth', authRoutes);
+app.use('/api/user', userRoutes);
+app.use('/api/transactions', transactionRoutes);
+app.use('/api/requests', requestRoutes);
+
+// Persona routes and webhooks
+app.use('/api/persona', personaRoutes);
 app.post('/api/persona/webhook', express.json({ verify: rawBodySaver }), handlePersonaWebhook);
 
-// Handle Persona inquiry creation
+// Persona inquiry creation endpoint
 app.post('/api/persona/create-inquiry', authenticateUser, async (req, res) => {
   try {
     const { referenceId, redirectUrl } = req.body;
@@ -134,7 +147,7 @@ app.post('/api/persona/create-inquiry', authenticateUser, async (req, res) => {
   }
 });
 
-// Handle verification completion
+// Persona verification completion endpoint
 app.post('/api/persona/complete-verification', authenticateUser, async (req, res) => {
   try {
     const { inquiryId } = req.body;
@@ -178,7 +191,7 @@ app.post('/api/persona/complete-verification', authenticateUser, async (req, res
   }
 });
 
-// Get verification status
+// Persona verification status endpoint
 app.get('/api/persona/verification-status', authenticateUser, async (req, res) => {
   try {
     const userId = req.user.id; 
@@ -194,6 +207,12 @@ app.get('/api/persona/verification-status', authenticateUser, async (req, res) =
     res.status(500).json({ error: 'Failed to fetch verification status' });
   }
 });
+
+// Unit.co integration routes
+app.use('/api/unit', unitRoutes); // General Unit endpoints
+app.use('/api/unit/accounts', unitAccountRoutes); // Account endpoints 
+app.use('/api/unit/transactions', unitTransactionRoutes); // Transaction endpoints
+app.use('/api/unit/webhook', unitWebhookRoutes); // Webhook endpoints
 
 // Fallback to frontend for all other routes
 app.get('*', (req, res) => {
