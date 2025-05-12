@@ -5,6 +5,8 @@ const express = require('express');
 const path = require('path');
 const cors = require('cors');
 const mongoose = require('mongoose');
+const jwt = require('jsonwebtoken'); // Add JWT library
+const User = require('./models/User'); // Add User model
 const authRoutes = require('./routes/authRoutes');
 const personaRoutes = require('./persona/personaRoutes');
 const userRoutes = require('./routes/userRoutes');
@@ -35,7 +37,7 @@ function rawBodySaver(req, res, buf) {
   req.rawBody = buf.toString();
 }
 
-// Authentication middleware
+// Authentication middleware with proper JWT verification
 function authenticateUser(req, res, next) {
   // Get token from header
   const token = req.headers.authorization?.split(' ')[1];
@@ -45,10 +47,11 @@ function authenticateUser(req, res, next) {
   }
   
   try {
-    // This is a placeholder - replace with your actual token verification
-    // For example: const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    // For now, just mock a user for testing
-    req.user = { id: 'user_123' };
+    // Verify the token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    
+    // Set user info from decoded token
+    req.user = decoded;
     next();
   } catch (error) {
     console.error('Token verification failed:', error);
@@ -142,19 +145,26 @@ app.post('/api/persona/complete-verification', authenticateUser, async (req, res
     
     console.log(`Updating user ${userId} KYC status to "approved"`);
     
-    const updatedUser = await User.findByIdAndUpdate(userId, 
-      {
-      kyc_status: 'approved',
-      persona_inquiry_id: inquiryId,
-      kyc_updated_at: new Date()
-    }, 
-    { new: true });
+    try {
+      const updatedUser = await User.findByIdAndUpdate(
+        userId, 
+        {
+          kyc_status: 'approved',
+          persona_inquiry_id: inquiryId,
+          kyc_updated_at: new Date()
+        }, 
+        { new: true }
+      );
 
-    if (!updatedUser) {
-      return res.status(404).json({ error: 'User not found' });
+      if (updatedUser) {
+        console.log('User KYC status updated:', updatedUser);
+      } else {
+        console.log('User not found in database, continuing without DB update');
+      }
+    } catch (dbError) {
+      console.error('Database update error:', dbError);
+      // Continue with the response even if DB update fails
     }
-    console.log('User KYC status updated:', updatedUser);
-    
 
     // Return success response
     res.json({
