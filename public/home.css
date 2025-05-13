@@ -45,19 +45,19 @@ h2 {
 }
 
 .retailsectionh2 {
-  font-size: 30px;
-  color: #0033cc;
-  margin-bottom: 1.5rem;
-  text-align: center;
+  font-size: 30px !important; 
+  color: #0033cc !important;
+  margin-bottom: 1.5rem !important;
+  text-align: center !important;
 }
 
 .retailsectiongrid {
-  display: grid;
-  grid-template-columns: 1f 1fr 1fr;
-  grid-template-rows: 1fr 1fr;
-  gap: 30px;
-  margin: 30px auto;
-  padding: 10px;
+  display: grid !important;
+  grid-template-columns: 1f 1fr 1fr !important;
+  grid-template-rows: 1fr 1fr !important;
+  gap: 30px !important;
+  margin: 30px auto !important;
+  padding: 10px !important;
 }
 
 .retailitem {
