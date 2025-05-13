@@ -45,7 +45,10 @@ h2 {
 }
 
 .retailsectionh2 {
-  Color: blue;
+  font-size: 30px;
+  color: #0033cc;
+  margin-bottom: 1.5rem;
+  text-align: center;
 }
 
 .retailsectiongrid {
