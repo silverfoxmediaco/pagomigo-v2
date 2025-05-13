@@ -478,10 +478,11 @@ h2 {
         gap: 20px;
       }
 
-        .retail-grid {
-          grid-template-columns: 1fr;
-          grid-template-rows: repeat(6, 1fr);
-        }
+        .retailsectiongrid {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    gap: 20px;
+  }
 
       }
       
