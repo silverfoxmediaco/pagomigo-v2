@@ -44,7 +44,7 @@ h2 {
   animation: fadeInUp 0.5s ease-in-out;
 }
 
-.retail-grid {
+.retailsectiongrid {
   display: grid;
   grid-template-columns: 1f 1fr 1fr;
   grid-template-rows: 1fr 1fr;
@@ -479,7 +479,7 @@ h2 {
       }
 
         .retailsectiongrid {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 1fr;
     grid-template-rows: auto;
     gap: 20px;
   }
