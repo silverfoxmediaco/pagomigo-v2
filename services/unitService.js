@@ -1,9 +1,16 @@
-// services/unitService.js
 const unit = require('../config/unit');
 
-// Service for Unit banking operations
 const unitService = {
-  // Create a customer in Unit
+  async listAccounts(params) {
+    try {
+      const response = await unit.accounts.list(params);
+      return response.data;
+    } catch (error) {
+      console.error('Error listing Unit accounts:', error);
+      throw error;
+    }
+  },
+
   async createCustomer(customerData) {
     try {
       const response = await unit.customers.create({
@@ -14,7 +21,7 @@ const unitService = {
             last: customerData.lastName
           },
           ssn: customerData.ssn,
-          dateOfBirth: customerData.dateOfBirth, // format: 'YYYY-MM-DD'
+          dateOfBirth: customerData.dateOfBirth,
           address: {
             street: customerData.street,
             city: customerData.city,
@@ -25,7 +32,7 @@ const unitService = {
           email: customerData.email,
           phone: {
             countryCode: '1',
-            number: customerData.phone.replace(/\D/g, '') // Strip non-digits
+            number: customerData.phone.replace(/\D/g, '')
           }
         }
       });
@@ -37,7 +44,6 @@ const unitService = {
     }
   },
   
-  // Create a deposit account
   async createDepositAccount(customerId) {
     try {
       const response = await unit.accounts.create({
@@ -65,7 +71,6 @@ const unitService = {
     }
   },
   
-  // Get account details
   async getAccount(accountId) {
     try {
       const response = await unit.accounts.get(accountId);
@@ -76,7 +81,6 @@ const unitService = {
     }
   },
   
-  // Send money between Unit accounts
   async sendMoney(fromAccountId, toAccountId, amountInCents, description) {
     try {
       const response = await unit.bookPayments.create({
@@ -108,7 +112,6 @@ const unitService = {
     }
   },
   
-  // List transactions for an account
   async listTransactions(accountId) {
     try {
       const response = await unit.transactions.list({
