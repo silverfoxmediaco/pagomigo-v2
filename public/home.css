@@ -485,11 +485,19 @@ h2 {
         gap: 20px;
       }
 
-        .retailsectiongrid {
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: auto;
-    gap: 20px;
-  }
+            .retailsectiongrid {
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: auto;
+        gap: 20px;
+      }
+    
+        .retailsectionh2 {
+      font-size: 30px; 
+      color: #0033cc;
+      margin-bottom: 1.5rem;
+      text-align: center;
+      line-height: normal;
+      }
 
       }
       
