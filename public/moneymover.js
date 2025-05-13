@@ -209,9 +209,12 @@ async function fetchUserBalance() {
     const balanceElement = document.getElementById('user-balance');
     
     if (!balanceElement) return;
+    //For testing balance of $500
+    balanceElement.textContent = '$500.00';
+    return;
     
     // Try to get Unit balance first
-    try {
+    /*try {
       const unitResponse = await fetch(`${API_BASE}/api/unit/accounts/balance`, {
         headers: {
           'Authorization': `Bearer ${token}`
@@ -247,7 +250,7 @@ async function fetchUserBalance() {
       balanceElement.textContent = `$${balance.toFixed(2)}`;
     } else {
       balanceElement.textContent = '$500.00'; // Fallback value
-    }
+    }*/
   } catch (error) {
     console.error('Error fetching balance:', error);
     if (balanceElement) {
