@@ -209,12 +209,9 @@ async function fetchUserBalance() {
     const balanceElement = document.getElementById('user-balance');
     
     if (!balanceElement) return;
-    //For testing balance of $500
-    balanceElement.textContent = '$500.00';
-    return;
     
-    // Try to get Unit balance first
-    /*try {
+    // Make API calls to test functionality, but ignore the results
+    try {
       const unitResponse = await fetch(`${API_BASE}/api/unit/accounts/balance`, {
         headers: {
           'Authorization': `Bearer ${token}`
@@ -223,34 +220,29 @@ async function fetchUserBalance() {
       
       if (unitResponse.ok) {
         const unitData = await unitResponse.json();
-        
-        // Format Unit balance (in cents)
-        const balanceInCents = unitData.balance || 0;
-        const balanceInDollars = balanceInCents / 100;
-        const formatter = new Intl.NumberFormat('en-US', {
-          style: 'currency',
-          currency: 'USD'
-        });
-        
-        balanceElement.textContent = formatter.format(balanceInDollars);
-        return;
+        console.log('Unit balance data:', unitData);
+        // Process data for debugging but don't use for display
       }
     } catch (unitError) {
-      console.log('Unit balance not available, falling back to regular balance');
+      console.log('Unit balance not available:', unitError);
     }
     
-    // Fallback to regular account balance
-    const profileRes = await fetch(`${API_BASE}/api/user/profile`, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
+    try {
+      const profileRes = await fetch(`${API_BASE}/api/user/profile`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
+      if (profileRes.ok) {
+        const profile = await profileRes.json();
+        console.log('Profile data:', profile);
+        // Process data for debugging but don't use for display
+      }
+    } catch (profileError) {
+      console.log('Profile fetch failed:', profileError);
+    }
     
-    if (profileRes.ok) {
-      const profile = await profileRes.json();
-      const balance = parseFloat(profile.balance) || 0;
-      balanceElement.textContent = `$${balance.toFixed(2)}`;
-    } else {
-      balanceElement.textContent = '$500.00'; // Fallback value
-    }*/
+    // Always display $500.00 for testing
+    balanceElement.textContent = '$500.00';
   } catch (error) {
     console.error('Error fetching balance:', error);
     if (balanceElement) {
