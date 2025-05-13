@@ -46,8 +46,8 @@ h2 {
 
 .retail-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: repeat(2, 1fr);
+  grid-template-columns: 1f 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
   gap: 30px;
   margin: 30px auto;
   padding: 10px;
