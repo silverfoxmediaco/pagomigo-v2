@@ -53,8 +53,8 @@ h2 {
 
 .retailsectiongrid {
   display: grid !important;
-  grid-template-columns: 1f 1fr 1fr !important;
-  grid-template-rows: 1fr 1fr !important;
+  grid-template-columns: 1fr 1fr 1fr !important;
+  grid-template-rows: auto !important;
   gap: 30px !important;
   margin: 30px auto !important;
   padding: 10px !important;
