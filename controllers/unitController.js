@@ -1,4 +1,3 @@
-// controllers/unitController.js
 const unitService = require('../services/unitService');
 const User = require('../models/User');
 const UnitAccount = require('../models/UnitAccount');
@@ -6,7 +5,6 @@ const UnitTransaction = require('../models/UnitTransaction');
 
 exports.testConnection = async (req, res) => {
   try {
-    // Simple test to verify SDK connection
     const accounts = await unitService.listAccounts({
       page: { limit: 1 }
     });
@@ -38,7 +36,6 @@ exports.createCustomer = async (req, res) => {
       });
     }
     
-    // Check if user already has a Unit customer
     if (user.unitCustomerId) {
       return res.status(400).json({
         success: false,
@@ -46,7 +43,6 @@ exports.createCustomer = async (req, res) => {
       });
     }
     
-    // Format customer data
     const customerData = {
       firstName: req.body.firstName || user.firstName,
       lastName: req.body.lastName || user.lastName,
@@ -60,10 +56,8 @@ exports.createCustomer = async (req, res) => {
       phone: user.phone
     };
     
-    // Create customer in Unit
     const customer = await unitService.createCustomer(customerData);
     
-    // Update user with Unit customer ID
     user.unitCustomerId = customer.id;
     await user.save();
     
@@ -84,30 +78,49 @@ exports.createCustomer = async (req, res) => {
   }
 };
 
-// Add other controller methods (createAccount, getMyAccount, etc.)...
-
 exports.handleWebhook = async (req, res) => {
   try {
-    // Verify webhook signature (implement this)
-    // const isValid = verifyWebhookSignature(req);
-    // if (!isValid) {
-    //   return res.status(401).json({ error: 'Invalid webhook signature' });
-    // }
+    const token = req.headers['x-unit-webhook-token'];
+    if (token !== process.env.UNIT_WEBHOOK_TOKEN) {
+      console.log('Webhook authentication failed: Invalid token');
+      return res.status(401).send('Unauthorized');
+    }
     
     const event = JSON.parse(req.body.toString());
     console.log('Received Unit webhook:', event.type);
     
-    // Process different event types
     switch (event.type) {
-      case 'payment.state.completed':
-        await processCompletedPayment(event.data);
+      case 'application.created':
+        console.log('New application created:', event.data.id);
+        break;
+        
+      case 'application.pending':
+      case 'application.approved':
+      case 'application.denied':
+        await processApplicationStatus(event.data);
         break;
       
       case 'account.created':
         await processAccountCreated(event.data);
         break;
       
-      // Add other event handlers
+      case 'account.closed':
+        await processAccountClosed(event.data);
+        break;
+      
+      case 'payment.state.completed':
+        await processCompletedPayment(event.data);
+        break;
+      
+      case 'payment.state.returned':
+        await processReturnedPayment(event.data);
+        break;
+      
+      case 'card.created':
+      case 'card.activated':
+      case 'card.status.updated':
+        await processCardEvent(event.type, event.data);
+        break;
       
       default:
         console.log(`Unhandled webhook event type: ${event.type}`);
@@ -116,15 +129,100 @@ exports.handleWebhook = async (req, res) => {
     res.status(200).send('OK');
   } catch (error) {
     console.error('Error processing Unit webhook:', error);
-    res.status(500).send('Webhook processing failed');
+    res.status(200).send('Webhook received, processing error logged');
   }
 };
 
-// Helper functions for webhook handling
-async function processCompletedPayment(data) {
-  // Implement payment processing logic
+async function processApplicationStatus(data) {
+  console.log(`Application ${data.id} status: ${data.attributes.status}`);
 }
 
 async function processAccountCreated(data) {
-  // Implement account creation logic
+  try {
+    const customerId = data.relationships.customer.id;
+    const user = await User.findOne({ unitCustomerId: customerId });
+    
+    if (!user) {
+      console.log(`No user found for Unit customer ID: ${customerId}`);
+      return;
+    }
+    
+    const account = new UnitAccount({
+      userId: user._id,
+      unitAccountId: data.id,
+      unitCustomerId: customerId,
+      type: data.attributes.type,
+      status: data.attributes.status,
+      createdAt: new Date()
+    });
+    
+    await account.save();
+    console.log(`Account ${data.id} created and saved to database`);
+  } catch (error) {
+    console.error('Error processing account creation:', error);
+  }
+}
+
+async function processAccountClosed(data) {
+  try {
+    await UnitAccount.findOneAndUpdate(
+      { unitAccountId: data.id },
+      { 
+        status: data.attributes.status,
+        closedAt: new Date()
+      }
+    );
+    console.log(`Account ${data.id} marked as closed`);
+  } catch (error) {
+    console.error('Error processing account closure:', error);
+  }
+}
+
+async function processCompletedPayment(data) {
+  try {
+    const accountId = data.relationships.account.id;
+    const unitAccount = await UnitAccount.findOne({ unitAccountId: accountId });
+    
+    if (!unitAccount) {
+      console.log(`No account found for Unit account ID: ${accountId}`);
+      return;
+    }
+    
+    const transaction = new UnitTransaction({
+      userId: unitAccount.userId,
+      unitAccountId: accountId,
+      unitTransactionId: data.id,
+      type: data.attributes.type,
+      amount: data.attributes.amount,
+      direction: data.attributes.direction,
+      status: 'completed',
+      description: data.attributes.description,
+      createdAt: new Date(data.attributes.createdAt)
+    });
+    
+    await transaction.save();
+    console.log(`Payment ${data.id} recorded as completed transaction`);
+  } catch (error) {
+    console.error('Error processing completed payment:', error);
+  }
+}
+
+async function processReturnedPayment(data) {
+  try {
+    await UnitTransaction.findOneAndUpdate(
+      { unitTransactionId: data.id },
+      { 
+        status: 'returned',
+        returnReason: data.attributes.returnReason
+      }
+    );
+    console.log(`Payment ${data.id} marked as returned`);
+  } catch (error) {
+    console.error('Error processing returned payment:', error);
+  }
+}
+
+async function processCardEvent(eventType, data) {
+  const eventAction = eventType.split('.').pop();
+  console.log(`Card ${data.id} event: ${eventAction}`);
 }
