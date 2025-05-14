@@ -482,7 +482,7 @@ h2 {
       grid-template-columns: 1fr;
     }
 
-    #desktop-video {
+    #hero-video {
       display: none; /* Hide desktop video on mobile */
     }
 
