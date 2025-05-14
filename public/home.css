@@ -48,6 +48,10 @@ main {
   object-fit: cover;
 }
 
+.mobile-video {
+  display: none; /* Hidden on desktop */
+}
+
 .hero-text {
   position: relative;
   z-index: 2; /* Keep text above video and overlay */
@@ -478,11 +482,19 @@ h2 {
       grid-template-columns: 1fr;
     }
 
+    .desktop-video {
+      display: none; /* Hide desktop video on mobile */
+    }
+
+    .mobile-video {
+      display: block; /* Show mobile video on mobile */
+    }
+
     .heroh1 {
-  font-size: 25px;
-    color: #0033cc;
-    margin-bottom: 1rem;
-}
+      font-size: 25px;
+        color: #ffffff;
+        margin-bottom: 1rem;
+    }
   
     .debit-card-text h2 {
       font-size: 30px;
