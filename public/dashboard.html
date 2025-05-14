@@ -162,36 +162,37 @@
 </section>
 
 <section class="page-header">
-  <h1>Connected Accounts</h1>
+  <h2 class="plaidh1">Connected Accounts</h2>
   <p>Connect and manage your bank accounts securely with Plaid</p>
-</section>
+
 
 <section class="accounts-section">
-  <div class="connect-account-button-container">
-    <button id="connect-bank-btn" class="primary-btn">
-      <img src="account_balance_24dp_000000_FILL0_wght400_GRAD0_opsz24.svg" alt="Bank" class="btn-icon">
-      Connect a Bank Account
-    </button>
-  </div>
-
-  <!-- Messages -->
-  <div id="error-message" class="error-message hidden"></div>
-  <div id="success-message" class="success-message hidden"></div>
-
-  <!-- No accounts message -->
-  <div id="no-accounts-message" class="no-account-container">
-    <h3>No Connected Accounts</h3>
-    <p>Connect your bank accounts to easily transfer money, check balances, and view transactions.</p>
-  </div>
-
-  <!-- Connected accounts container -->
-  <div id="accounts-container" class="accounts-container hidden">
-    <h3>Your Connected Accounts</h3>
-    <ul id="accounts-list" class="accounts-list">
-      <!-- Accounts will be populated by JS -->
-    </ul>
-  </div>
-</section>
+      <div class="connect-account-button-container">
+        <button id="connect-bank-btn" class="primary-btn">
+          <img src="account_balance_24dp_000000_FILL0_wght400_GRAD0_opsz24.svg" alt="Bank" class="btn-icon">
+          Connect a Bank Account
+        </button>
+      </div>
+    
+      <!-- Messages -->
+      <div id="error-message" class="error-message hidden"></div>
+      <div id="success-message" class="success-message hidden"></div>
+    
+      <!-- No accounts message -->
+      <div id="no-accounts-message" class="no-account-container">
+        <h3>No Connected Accounts</h3>
+        <p>Connect your bank accounts to easily transfer money, check balances, and view transactions.</p>
+      </div>
+    
+      <!-- Connected accounts container -->
+      <div id="accounts-container" class="accounts-container hidden">
+        <h3>Your Connected Accounts</h3>
+        <ul id="accounts-list" class="accounts-list">
+          <!-- Accounts will be populated by JS -->
+        </ul>
+      </div>
+    </section>
+  </section>
 
 <!-- Transactions Section (Initially Hidden) -->
 <section id="transactions-section" class="transactions-section hidden">
