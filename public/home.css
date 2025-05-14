@@ -48,7 +48,7 @@ main {
   object-fit: cover;
 }
 
-.mobile-video {
+#mobile-video {
   display: none; /* Hidden on desktop */
 }
 
@@ -482,11 +482,11 @@ h2 {
       grid-template-columns: 1fr;
     }
 
-    .desktop-video {
+    #desktop-video {
       display: none; /* Hide desktop video on mobile */
     }
 
-    .mobile-video {
+    #mobile-video {
       display: block; /* Show mobile video on mobile */
     }
 
