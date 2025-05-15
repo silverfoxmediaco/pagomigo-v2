@@ -1,2 +1,3 @@
 # Pagomigo
-A digital wallet platform for the Hispanic community.
+La única billetera digital que necesitarás.
+The only digital wallet you will ever need. 
