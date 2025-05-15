@@ -1,6 +1,4 @@
-// dashboard.js
-
-// Burger menu logic
+// ========== Burger Menu ==========
 const hamburger = document.getElementById("hamburger");
 const slideoutMenu = document.getElementById("slideoutMenu");
 const closeBtn = document.getElementById("closeMenu");
@@ -17,729 +15,305 @@ if (closeBtn) {
   });
 }
 
-// Use your custom domain as the API base
 const API_BASE = '';
 
-// Fetch user profile, transactions, and incoming requests
-async function loadDashboard() {
-  try {
-    const token = localStorage.getItem('token');
-
-    if (!token) {
-      window.location.href = 'login.html';
-      return;
-    }
-    
-    const profileRes = await fetch(`${API_BASE}/api/user/profile`, {
-      method: 'GET',
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
-
-    if (profileRes.status === 401) {
-      window.location.href = 'login.html';
-      return;
-    }
-
-    const profile = await profileRes.json();
-    console.log('User profile data:', profile);
-
-    // Get all the elements we need to update
-    const kycBanner = document.getElementById('kyc-banner'); // Moved up here
-    const nameEl = document.getElementById('user-name');
-    const phoneEl = document.getElementById('user-phone');
-    const emailEl = document.getElementById('user-email');
-    const addressEl = document.getElementById('user-address');
-    const kycEl = document.getElementById('user-kyc');
-    const balanceEl = document.getElementById('user-balance');
-    
-    // Update elements if they exist
-    if (nameEl) {
-      // Use name if available, username as fallback, or "User" as default
-      nameEl.textContent = profile.name || profile.username || 'User';
-    }
-    
-    if (phoneEl) {
-      phoneEl.textContent = profile.phone || 'Phone not available';
-    }
-    
-    if (emailEl) {
-      emailEl.textContent = profile.email || 'Email not available';
-    }
-    
-    if (addressEl) {
-      addressEl.textContent = profile.address || 'Address not available';
-    }
-    
-    if (kycEl) {
-      const kycStatus = profile.kyc_status || profile.kycStatus || 'pending';
-      const statusDisplay = {
-        'pending': 'Pending',
-        'approved': 'Approved',
-        'rejected': 'Rejected',
-        'pending_review': 'Under Review'
-      };
-      kycEl.textContent = statusDisplay[kycStatus] || 'Pending';
-      kycEl.className = '';
-      kycEl.classList.add(`status-${kycStatus}`); // Fixed to use correct variable and element
-    }
-    
-    if (balanceEl) {
-      const balance = parseFloat(profile.balance) || 0;
-      balanceEl.textContent = `$${balance.toFixed(2)}`;
-    }
-
-    // KYC banner logic
-    if (kycBanner) {
-      const kycStatus = profile.kyc_status || profile.kycStatus || 'pending';
-      if (kycStatus === 'approved' || kycStatus === 'pending_review') {
-        kycBanner.style.display = 'none';
-      } else {
-        kycBanner.style.display = 'block';
-        // Event listener for KYC button
-        const startKycBtn = document.getElementById('start-kyc-btn');
-        if (startKycBtn) {
-          startKycBtn.addEventListener('click', function() {
-            window.location.href = 'identity-verification.html'; // Changed from kyc.html
-          });
-        }
-      }
-    }
-
-    const txRes = await fetch(`${API_BASE}/api/transactions/history`, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
-
-    const transactions = await txRes.json();
-    const txList = document.getElementById('transaction-list');
-    txList.innerHTML = '';
-    transactions.forEach(tx => {
-      const li = document.createElement('li');
-      li.textContent = `${tx.recipientName} • ${tx.recipientCountry} • $${tx.amountUsd} • ${tx.status}`;
-      txList.appendChild(li);
-    });
-
-    const reqRes = await fetch(`${API_BASE}/api/requests`, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
-
-    const requests = await reqRes.json();
-    const reqList = document.getElementById('request-list');
-    reqList.innerHTML = '';
-    requests.forEach(req => {
-      const li = document.createElement('li');
-      li.textContent = `${req.requestNote} • $${req.amountUsd} • From: ${req.requesterId?.name || 'User'}`;
-
-      if (req.status === 'pending') {
-        const approveBtn = document.createElement('button');
-        approveBtn.textContent = 'Approve';
-        approveBtn.classList.add('approve-btn');
-        approveBtn.addEventListener('click', () => approveRequest(req._id));
-        li.appendChild(approveBtn);
-
-        const declineBtn = document.createElement('button');
-        declineBtn.textContent = 'Decline';
-        declineBtn.classList.add('decline-btn');
-        declineBtn.addEventListener('click', () => declineRequest(req._id));
-        li.appendChild(declineBtn);
-      }
-
-      reqList.appendChild(li);
-    });
-    
-  } catch (err) {
-    console.error('Dashboard load error:', err);
-    console.error('Error details:', err.message);
-    window.location.href = 'login.html';
-  }
-}
-
-async function approveRequest(requestId) {
-  try {
-    const token = localStorage.getItem('token');
-    const res = await fetch(`${API_BASE}/api/requests/${requestId}/approve`, {
-      method: 'PUT',
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
-
-    const result = await res.json();
-    alert(result.message || 'Request approved');
-    loadDashboard();
-  } catch (error) {
-    console.error('Approve request error:', error);
-    alert('Failed to approve request');
-  }
-}
-
-async function declineRequest(requestId) {
-  try {
-    const token = localStorage.getItem('token');
-    const res = await fetch(`${API_BASE}/api/requests/${requestId}/decline`, {
-      method: 'PUT',
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
-
-    const result = await res.json();
-    alert(result.message || 'Request declined');
-    loadDashboard();
-  } catch (error) {
-    console.error('Decline request error:', error);
-    alert('Failed to decline request');
-  }
-}
-
-// Load dashboard data on page load
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', loadDashboard);
-} else {
-  loadDashboard();
-}
-
-const modal = document.getElementById('editProfileModal');
-const openBtn = document.getElementById('openEditProfileModal');
-const closeProfileBtn = document.querySelector('.close-profile-modal');
-const form = document.getElementById('editProfileForm');
-
-openBtn.addEventListener('click', async () => {
-  try {
-    // Load current profile
-    const token = localStorage.getItem('token');
-    const res = await fetch(`${API_BASE}/api/user/profile`, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
-
-    if (res.ok) {
-      const user = await res.json();
-      console.log('Profile data for edit form:', user); // Debug log
-      
-      // Populate form fields
-      document.getElementById('edit-name').value = user.name || '';
-      document.getElementById('edit-username').value = user.username || '';
-      document.getElementById('edit-email').value = user.email || '';
-      document.getElementById('edit-phone').value = user.phone || '';
-      document.getElementById('edit-address').value = user.address || '';
-      
-      modal.classList.add('open');
-    } else {
-      console.error('Failed to fetch profile for editing:', await res.text());
-      alert('Could not load your profile. Please try again.');
-    }
-  } catch (error) {
-    console.error('Error in edit profile modal:', error);
-    alert('An error occurred. Please try again.');
-  }
-});
-
-closeProfileBtn.addEventListener('click', () => {
-  modal.classList.remove('open');
-});
-
-form.addEventListener('submit', async (e) => {
-  e.preventDefault();
-
-  try {
-    const token = localStorage.getItem('token');
-    const updatedUser = {
-      name: document.getElementById('edit-name').value,
-      username: document.getElementById('edit-username').value,
-      email: document.getElementById('edit-email').value,
-      phone: document.getElementById('edit-phone').value,
-      address: document.getElementById('edit-address').value
-    };
-
-    console.log('Sending updated profile data:', updatedUser); // Debug log
-
-    const res = await fetch(`${API_BASE}/api/user/profile`, {
-      method: 'PUT',
-      headers: { 
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify(updatedUser)
-    });
-
-    if (res.ok) {
-      const result = await res.json();
-      console.log('Profile update response:', result); // Debug log
-      
-      alert("Profile updated successfully!");
-      modal.classList.remove('open');
-      loadDashboard(); // refresh the UI
-    } else {
-      const errorText = await res.text();
-      console.error('Profile update failed:', errorText);
-      alert("Failed to update profile. Please try again.");
-    }
-  } catch (error) {
-    console.error('Profile update error:', error);
-    alert("An error occurred while updating your profile.");
-  }
-});
-
-// Event listener for logout button// Unit Banking Integration
-document.addEventListener('DOMContentLoaded', function() {
-  // Initialize banking functionality
-  initBanking();
-});
-
-function initBanking() {
-  // Banking section elements
-  const sendMoneyTrigger = document.getElementById('send-money-trigger');
-  const requestMoneyTrigger = document.getElementById('request-money-trigger');
-  const depositTrigger = document.getElementById('deposit-trigger');
-  const sendMoneyPanel = document.getElementById('send-money-panel');
-  const requestMoneyPanel = document.getElementById('request-money-panel');
-  const closePanelButtons = document.querySelectorAll('.close-panel');
-  const sendMoneyForm = document.getElementById('send-money-form');
-  const requestMoneyForm = document.getElementById('request-money-form');
-  const setupAccountBtn = document.getElementById('setup-account-btn');
-  
-  // Check if user has a Unit account
-  checkUnitAccount();
-  
-  // Event listeners for banking action buttons
-  if (sendMoneyTrigger && sendMoneyPanel) {
-    sendMoneyTrigger.addEventListener('click', () => {
-      hideAllPanels();
-      sendMoneyPanel.classList.remove('hidden');
-    });
-  }
-  
-  if (requestMoneyTrigger && requestMoneyPanel) {
-    requestMoneyTrigger.addEventListener('click', () => {
-      hideAllPanels();
-      requestMoneyPanel.classList.remove('hidden');
-    });
-  }
-  
-  if (depositTrigger) {
-    depositTrigger.addEventListener('click', () => {
-      alert('Deposit functionality will be available soon!');
-    });
-  }
-  
-  // Close panel buttons
-  closePanelButtons.forEach(button => {
-    button.addEventListener('click', () => {
-      hideAllPanels();
-    });
-  });
-  
-  // Form submissions
-  if (sendMoneyForm) {
-    sendMoneyForm.addEventListener('submit', handleSendMoney);
-  }
-  
-  if (requestMoneyForm) {
-    requestMoneyForm.addEventListener('submit', handleRequestMoney);
-  }
-  
-  // Setup account button
-  if (setupAccountBtn) {
-    setupAccountBtn.addEventListener('click', () => {
-      setupUnitAccount();
-    });
-  }
-  
-  // Fetch Unit balance
-  fetchUnitBalance();
-}
-
-// Hide all action panels
+// ========== Hide All Panels ==========
 function hideAllPanels() {
-  const panels = document.querySelectorAll('.action-panel');
-  panels.forEach(panel => {
-    panel.classList.add('hidden');
-  });
+  document.querySelectorAll('.action-panel, .plaid-panel').forEach(panel => panel.classList.add('hidden'));
 }
 
-// Check if user has a Unit account
-async function checkUnitAccount() {
-  try {
-    const token = localStorage.getItem('token');
-    const response = await fetch(`${API_BASE}/api/unit/accounts/me`, {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    });
-    
-    if (response.status === 404) {
-      // User doesn't have a Unit account
-      document.getElementById('no-account-message').classList.remove('hidden');
-      
-      // Disable banking buttons
-      document.getElementById('send-money-trigger').disabled = true;
-      document.getElementById('request-money-trigger').disabled = true;
-      document.getElementById('deposit-trigger').disabled = true;
-    }
-  } catch (error) {
-    console.error('Error checking Unit account:', error);
+// ========== Format Currency ==========
+function formatCurrency(amount) {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD'
+  }).format(amount);
+}
+
+// ========== Show Messages ==========
+function showPlaidError(message) {
+  const el = document.getElementById('plaid-error-message');
+  if (el) {
+    el.textContent = message;
+    el.classList.remove('hidden');
+    setTimeout(() => el.classList.add('hidden'), 5000);
   }
 }
 
-// Fetch and display Unit balance
-async function fetchUnitBalance() {
-  try {
-    const token = localStorage.getItem('token');
-    const unitBalanceElement = document.getElementById('unit-balance');
-    
-    const response = await fetch(`${API_BASE}/api/unit/accounts/balance`, {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    });
-    
-    if (response.ok) {
-      const data = await response.json();
-      
-      // Format balance as currency (assuming balance is in cents)
-      const balanceInDollars = data.balance / 100;
-      const formatter = new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'USD'
-      });
-      
-      unitBalanceElement.textContent = formatter.format(balanceInDollars);
-    } else if (response.status !== 404) {
-      // Only show error if it's not a 404 (no account)
-      unitBalanceElement.textContent = 'Error loading balance';
-    }
-  } catch (error) {
-    console.error('Error fetching Unit balance:', error);
-    document.getElementById('unit-balance').textContent = 'Error loading balance';
+function showPlaidSuccess(message) {
+  const el = document.getElementById('plaid-success-message');
+  if (el) {
+    el.textContent = message;
+    el.classList.remove('hidden');
+    setTimeout(() => el.classList.add('hidden'), 5000);
   }
 }
 
-// Handle sending money
-async function handleSendMoney(e) {
-  e.preventDefault();
-  
-  const sendButton = document.getElementById('send-button');
-  const errorMessage = document.getElementById('send-error-message');
-  
-  // Get form data
-  const receiver = document.getElementById('receiver-input').value.trim();
-  const amount = parseFloat(document.getElementById('amount-input').value);
-  const note = document.getElementById('note-input').value.trim();
-  
-  // Basic validation
-  if (!receiver) {
-    showError(errorMessage, 'Please enter a recipient');
-    return;
+// ========== Debounce ==========
+function debounce(func, delay = 500) {
+  let timeout;
+  return function (...args) {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func.apply(this, args), delay);
+  };
+}
+
+// ========== Plaid Integration ==========
+function loadPlaidIntegration() {
+  if (!document.getElementById('plaid-link-script')) {
+    const script = document.createElement('script');
+    script.id = 'plaid-link-script';
+    script.src = 'https://cdn.plaid.com/link/v2/stable/link-initialize.js';
+    script.async = true;
+    document.head.appendChild(script);
   }
-  
-  if (isNaN(amount) || amount <= 0) {
-    showError(errorMessage, 'Please enter a valid amount');
-    return;
-  }
-  
-  // Convert to cents for API
-  const amountInCents = Math.round(amount * 100);
-  
+  initPlaid();
+}
+
+function initPlaid() {
+  const connectBtn = document.getElementById('connect-bank-btn');
+  const viewTxBtn = document.getElementById('view-transactions-btn');
+  const panel = document.getElementById('plaid-transactions-panel');
+  const accFilter = document.getElementById('account-filter');
+  const dateFilter = document.getElementById('date-filter');
+  const loadMoreBtn = document.getElementById('load-more-transactions');
+
+  if (!connectBtn) return;
+
+  connectBtn.addEventListener('click', openPlaidLink);
+  viewTxBtn?.addEventListener('click', togglePlaidTransactionsPanel);
+  panel?.querySelector('.close-panel')?.addEventListener('click', () => panel.classList.add('hidden'));
+
+  accFilter?.addEventListener('change', debounce(() => loadPlaidTransactions()));
+  dateFilter?.addEventListener('change', debounce(() => loadPlaidTransactions()));
+  loadMoreBtn?.addEventListener('click', () => loadPlaidTransactions(true));
+
+  loadPlaidAccounts();
+}
+
+async function openPlaidLink() {
   try {
-    // Show loading state
-    sendButton.disabled = true;
-    sendButton.classList.add('loading');
-    errorMessage.classList.add('hidden');
-    
     const token = localStorage.getItem('token');
-    const response = await fetch(`${API_BASE}/api/unit/payments/send`, {
+    const res = await fetch(`${API_BASE}/api/plaid/create-link-token`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify({
-        receiver,
-        amount: amountInCents,
-        description: note
-      })
+      headers: { 'Authorization': `Bearer ${token}` }
     });
-    
-    // Reset loading state
-    sendButton.disabled = false;
-    sendButton.classList.remove('loading');
-    
-    if (response.ok) {
-      const result = await response.json();
-      
-      // Reset form
-      document.getElementById('send-money-form').reset();
-      
-      // Hide panel
-      hideAllPanels();
-      
-      // Show success alert
-      alert('Money sent successfully!');
-      
-      // Refresh dashboard data
-      loadDashboard();
-      fetchUnitBalance();
-    } else {
-      const error = await response.json();
-      showError(errorMessage, error.message || 'Failed to send money');
-    }
-  } catch (error) {
-    console.error('Error sending money:', error);
-    showError(errorMessage, 'An error occurred. Please try again.');
-    
-    // Reset loading state
-    sendButton.disabled = false;
-    sendButton.classList.remove('loading');
-  }
-}
+    const { link_token } = await res.json();
 
-// Handle requesting money
-async function handleRequestMoney(e) {
-  e.preventDefault();
-  
-  const requestButton = document.getElementById('request-button');
-  const errorMessage = document.getElementById('request-error-message');
-  
-  // Get form data
-  const requestFrom = document.getElementById('request-from-input').value.trim();
-  const amount = parseFloat(document.getElementById('request-amount-input').value);
-  const note = document.getElementById('request-note-input').value.trim();
-  
-  // Basic validation
-  if (!requestFrom) {
-    showError(errorMessage, 'Please enter a recipient');
-    return;
-  }
-  
-  if (isNaN(amount) || amount <= 0) {
-    showError(errorMessage, 'Please enter a valid amount');
-    return;
-  }
-  
-  try {
-    // Show loading state
-    requestButton.disabled = true;
-    requestButton.classList.add('loading');
-    errorMessage.classList.add('hidden');
-    
-    const token = localStorage.getItem('token');
-    const response = await fetch(`${API_BASE}/api/requests/create`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify({
-        requestedFrom: requestFrom,
-        amountUsd: amount,
-        requestNote: note
-      })
-    });
-    
-    // Reset loading state
-    requestButton.disabled = false;
-    requestButton.classList.remove('loading');
-    
-    if (response.ok) {
-      const result = await response.json();
-      
-      // Reset form
-      document.getElementById('request-money-form').reset();
-      
-      // Hide panel
-      hideAllPanels();
-      
-      // Show success alert
-      alert('Money request sent successfully!');
-      
-      // Refresh dashboard data
-      loadDashboard();
-    } else {
-      const error = await response.json();
-      showError(errorMessage, error.message || 'Failed to request money');
-    }
-  } catch (error) {
-    console.error('Error requesting money:', error);
-    showError(errorMessage, 'An error occurred. Please try again.');
-    
-    // Reset loading state
-    requestButton.disabled = false;
-    requestButton.classList.remove('loading');
-  }
-}
-
-// Setup Unit account
-async function setupUnitAccount() {
-  try {
-    const token = localStorage.getItem('token');
-    const response = await fetch(`${API_BASE}/api/unit/accounts/create`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    });
-    
-    if (response.ok) {
-      alert('Banking account created successfully!');
-      
-      // Refresh the page to show the new account
-      window.location.reload();
-    } else {
-      const error = await response.json();
-      alert(error.message || 'Failed to create banking account');
-    }
-  } catch (error) {
-    console.error('Error setting up Unit account:', error);
-    alert('An error occurred while setting up your banking account');
-  }
-}
-
-// Show error message
-function showError(element, message) {
-  element.textContent = message;
-  element.classList.remove('hidden');
-}
-
-// Enhanced transaction display
-function enhanceTransactionDisplay() {
-  const txList = document.getElementById('transaction-list');
-  if (!txList) return;
-  
-  // Clear current transactions
-  txList.innerHTML = '';
-  
-  // Get combined transactions from regular and Unit sources
-  Promise.all([
-    fetchRegularTransactions(),
-    fetchUnitTransactions()
-  ]).then(([regularTx, unitTx]) => {
-    // Combine and sort by date (newest first)
-    const allTransactions = [...regularTx, ...unitTx].sort((a, b) => {
-      return new Date(b.date) - new Date(a.date);
-    });
-    
-    if (allTransactions.length === 0) {
-      txList.innerHTML = '<li class="empty-message">No transactions yet</li>';
+    if (typeof Plaid === 'undefined') {
+      showPlaidError('Plaid failed to load.');
       return;
     }
-    
-    // Display transactions
-    allTransactions.forEach(tx => {
+
+    const handler = Plaid.create({
+      token: link_token,
+      onSuccess: (publicToken, metadata) => exchangePublicToken(publicToken, metadata),
+      onExit: (err, metadata) => console.log('User exited Plaid Link', err, metadata),
+      onEvent: (eventName, metadata) => console.log('Plaid Link event', eventName, metadata)
+    });
+
+    handler.open();
+  } catch (err) {
+    console.error('Open Plaid Link Error:', err);
+    showPlaidError('Error connecting bank.');
+  }
+}
+
+async function exchangePublicToken(publicToken, metadata) {
+  try {
+    const token = localStorage.getItem('token');
+    await fetch(`${API_BASE}/api/plaid/exchange-token`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        public_token: publicToken,
+        institution_name: metadata.institution.name
+      })
+    });
+    showPlaidSuccess('Bank account connected!');
+    loadPlaidAccounts();
+  } catch (err) {
+    console.error('Exchange Token Error:', err);
+    showPlaidError('Bank connection failed.');
+  }
+}
+
+async function loadPlaidAccounts() {
+  try {
+    const token = localStorage.getItem('token');
+    const list = document.getElementById('plaid-accounts-list');
+    const noMsg = document.getElementById('no-plaid-accounts');
+    const container = document.getElementById('plaid-accounts-container');
+    const viewTxBtn = document.getElementById('view-transactions-btn');
+
+    if (!list || !noMsg || !container) return;
+    list.innerHTML = '<li class="loading">Loading accounts...</li>';
+
+    const res = await fetch(`${API_BASE}/api/plaid/accounts`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    const { accounts = [] } = await res.json();
+
+    if (accounts.length === 0) {
+      container.classList.add('hidden');
+      noMsg.classList.remove('hidden');
+      viewTxBtn && (viewTxBtn.style.display = 'none');
+      return;
+    }
+
+    container.classList.remove('hidden');
+    noMsg.classList.add('hidden');
+    viewTxBtn && (viewTxBtn.style.display = 'flex');
+    list.innerHTML = '';
+    updateAccountFilter(accounts);
+
+    accounts.forEach(account => {
       const li = document.createElement('li');
-      li.className = 'transaction-item';
-      
-      const isDeposit = tx.direction === 'credit' || tx.type === 'deposit';
-      
-      // Format amount
-      const amount = new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'USD'
-      }).format(tx.amount);
-      
-      // Format date
-      const date = new Date(tx.date);
-      const formattedDate = date.toLocaleDateString('en-US', {
-        month: 'short',
-        day: 'numeric'
-      });
-      
+      li.className = 'plaid-account-item';
+      li.dataset.accountId = account.id;
+
+      const icon = account.type === 'credit' ? 'credit_card' :
+                   account.subtype === 'savings' ? 'savings' :
+                   'account_balance';
+
       li.innerHTML = `
-        <div class="transaction-details">
-          <span class="transaction-party">${tx.counterparty || tx.recipientName || 'Transfer'}</span>
-          <span class="transaction-date">${formattedDate}</span>
-          ${tx.description ? `<span class="transaction-description">${tx.description}</span>` : ''}
+        <div class="account-info">
+          <span class="material-icons account-icon">${icon}</span>
+          <div class="account-details">
+            <span class="account-name">${account.name}</span>
+            <div class="account-meta">
+              <span class="account-institution">${account.institution}</span>
+              <span class="account-number">•••• ${account.mask || '****'}</span>
+            </div>
+          </div>
         </div>
-        <div class="transaction-amount ${isDeposit ? 'positive' : 'negative'}">
-          ${isDeposit ? '+' : '-'}${amount}
-        </div>
+        <span class="account-balance">
+          <button class="refresh-balance-btn" data-account-id="${account.id}">
+            <span class="material-icons">refresh</span>
+          </button>
+          <span class="balance-amount" id="balance-${account.id}">$-.--</span>
+        </span>
       `;
-      
-      txList.appendChild(li);
+      list.appendChild(li);
+      fetchPlaidAccountBalance(account.id);
     });
-  }).catch(error => {
-    console.error('Error loading transactions:', error);
-    txList.innerHTML = '<li class="empty-message">Error loading transactions</li>';
+
+    list.querySelectorAll('.refresh-balance-btn').forEach(btn =>
+      btn.addEventListener('click', e => {
+        e.preventDefault();
+        fetchPlaidAccountBalance(btn.dataset.accountId, true);
+      })
+    );
+
+    updatePlaidTotalBalance();
+  } catch (err) {
+    console.error('Load Accounts Error:', err);
+    const list = document.getElementById('plaid-accounts-list');
+    list && (list.innerHTML = '<li class="error">Failed to load accounts</li>');
+  }
+}
+
+async function fetchPlaidAccountBalance(accountId, showLoading = false) {
+  try {
+    const token = localStorage.getItem('token');
+    const el = document.getElementById(`balance-${accountId}`);
+    if (!el) return;
+    if (showLoading) el.innerHTML = '<span class="loading-spinner"></span>';
+
+    const res = await fetch(`${API_BASE}/api/plaid/balance/${accountId}`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    const data = await res.json();
+    const balance = data.balance?.available ?? data.balance?.current ?? 0;
+    el.textContent = formatCurrency(balance);
+  } catch (err) {
+    console.error('Fetch Balance Error:', err);
+    const el = document.getElementById(`balance-${accountId}`);
+    el && (el.textContent = 'Error');
+  }
+}
+
+async function updatePlaidTotalBalance() {
+  try {
+    const token = localStorage.getItem('token');
+    const el = document.getElementById('plaid-total-balance');
+    if (!el) return;
+
+    const res = await fetch(`${API_BASE}/api/plaid/accounts`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    const { accounts = [] } = await res.json();
+
+    const balances = await Promise.all(
+      accounts.map(acc =>
+        fetch(`${API_BASE}/api/plaid/balance/${acc.id}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        })
+          .then(r => r.json())
+          .then(d => d.balance?.available ?? d.balance?.current ?? 0)
+          .catch(() => 0)
+      )
+    );
+
+    const total = balances.reduce((sum, b) => sum + b, 0);
+    el.textContent = formatCurrency(total);
+  } catch (err) {
+    console.error('Update Total Balance Error:', err);
+  }
+}
+
+function updateAccountFilter(accounts) {
+  const filter = document.getElementById('account-filter');
+  if (!filter) return;
+  const current = filter.value;
+  while (filter.options.length > 1) filter.remove(1);
+  accounts.forEach(a => {
+    const opt = document.createElement('option');
+    opt.value = a.id;
+    opt.textContent = `${a.name} (${a.institution})`;
+    filter.appendChild(opt);
   });
-}
-
-// Fetch regular transactions
-async function fetchRegularTransactions() {
-  try {
-    const token = localStorage.getItem('token');
-    const response = await fetch(`${API_BASE}/api/transactions/history`, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
-    
-    if (!response.ok) {
-      throw new Error('Failed to fetch transactions');
-    }
-    
-    const transactions = await response.json();
-    
-    // Map to a standardized format
-    return transactions.map(tx => ({
-      id: tx._id,
-      amount: parseFloat(tx.amountUsd),
-      recipientName: tx.recipientName,
-      counterparty: tx.recipientName,
-      date: tx.createdAt,
-      status: tx.status,
-      description: tx.description || '',
-      direction: 'debit', // Assuming outgoing by default
-      type: 'regular'
-    }));
-  } catch (error) {
-    console.error('Error fetching regular transactions:', error);
-    return [];
+  if ([...filter.options].some(o => o.value === current)) {
+    filter.value = current;
   }
 }
 
-// Fetch Unit transactions
-async function fetchUnitTransactions() {
-  try {
-    const token = localStorage.getItem('token');
-    const response = await fetch(`${API_BASE}/api/unit/transactions/history`, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
-    
-    if (!response.ok) {
-      // If 404, likely no Unit account yet
-      if (response.status === 404) {
-        return [];
-      }
-      throw new Error('Failed to fetch Unit transactions');
-    }
-    
-    const transactions = await response.json();
-    
-    // Map to a standardized format
-    return transactions.map(tx => ({
-      id: tx.unitTransactionId,
-      amount: tx.amount / 100, // Convert cents to dollars
-      counterparty: tx.counterpartyName,
-      date: tx.createdAt,
-      status: tx.status,
-      description: tx.description || '',
-      direction: tx.direction, // 'credit' or 'debit'
-      type: 'unit'
-    }));
-  } catch (error) {
-    console.error('Error fetching Unit transactions:', error);
-    return [];
+function togglePlaidTransactionsPanel() {
+  const panel = document.getElementById('plaid-transactions-panel');
+  if (!panel) return;
+  const isVisible = !panel.classList.contains('hidden');
+  hideAllPanels();
+  if (!isVisible) {
+    panel.classList.remove('hidden');
+    loadPlaidTransactions();
   }
 }
 
-// Call enhanced transaction display when loading dashboard
-const originalLoadDashboard = loadDashboard;
-loadDashboard = async function() {
-  await originalLoadDashboard();
-  enhanceTransactionDisplay();
-  fetchUnitBalance();
-};
+async function loadPlaidTransactions(append = false) {
+  // You can paste your existing `loadPlaidTransactions()` logic here
+  // or keep it modularized if already implemented elsewhere.
+}
 
-document.addEventListener('DOMContentLoaded', function() {
-  // Check for hash in URL
+// ========== DOM Ready Initialization ==========
+document.addEventListener('DOMContentLoaded', () => {
+  if (!document.querySelector('link[href*="material-icons"]')) {
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = 'https://fonts.googleapis.com/icon?family=Material+Icons';
+    document.head.appendChild(link);
+  }
+
+  loadDashboard?.();
+  initBanking?.();
+  loadPlaidIntegration();
+
   if (window.location.hash === '#banking') {
     const bankingSection = document.getElementById('banking');
-    if (bankingSection) {
-      setTimeout(() => {
-        bankingSection.scrollIntoView({ behavior: 'smooth' });
-      }, 500); // Small delay to ensure page is loaded
-    }
+    bankingSection && setTimeout(() => {
+      bankingSection.scrollIntoView({ behavior: 'smooth' });
+    }, 500);
   }
 });
