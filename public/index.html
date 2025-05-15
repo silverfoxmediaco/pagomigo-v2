@@ -3,13 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <meta property="og:title" content="Pagomigo - Send Money Fast and Securely">
+  <meta property="og:title" content="Pagomigo - Send Money Fast and Securely">
   <meta property="og:description" content="The digital wallet for the Hispanic world. Send and receive money with Pagomigo.">
   <meta property="og:image" content="pagomigodisplayimage.png">
-  <meta property="og:url" content="https://www.pagomigo.com/index.html">
+  <meta property="og:url" content="https://www.pagomigo.com/home.html">
   <meta property="og:type" content="website">
+
   <title>Pagomigo - Home</title>
   <link rel="stylesheet" href="home.css">
+  <link rel="icon" href="public/newpagomigofavicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
@@ -35,26 +37,77 @@
   </nav>
 
   <main class="hero-section">
+    <div class="video-background">
+    <div class="video-overlay"></div>
+    <video autoplay muted loop id="hero-video">
+      <source src="Spanishgirlshopping.mp4" type="video/mp4">
+      <!-- Fallback text if video doesn't load -->
+      Your browser does not support the video tag.
+    </video>
+      <!-- Mobile viewport -->
+      <video autoplay muted loop playsinline preload="auto" id="mobile-video" class="hero-video">
+      <source src="spanishgirlshoppingmobile.mp4" type="video/mp4">
+      Your browser does not support the video tag.
+    </video>
+    </div>
     <div class="hero-text">
-      <h1>Envía dinero con inteligencia,<br>seguridad y velocidad.</h1>
-      <p>The Digital Wallet for the Hispanic World</p>
+      <h1 class="heroh1" >Envía dinero con inteligencia,<br>seguridad y velocidad.</h1>
+      <h2 class="heroh2" >The only Digital Wallet You Need.</h2>
       <div class="cta-buttons">
-      <a href="moneymover.html" class="send-cta-button">Send/Request Payment</a>
+        <a href="dashboard.html#banking" class="send-cta-button">Send/Request Payment</a>
     
     </div>
       <div>
-        <h3>Únete ahora para empezar a enviar y recibir dinero.</h3>
+        <h3 class="heroh3">Únete ahora para empezar a enviar y recibir dinero.</h3>
         <button id="signupbtn">Join Now</button>
       </div>
     </div>
   </main>
 
+  <section class="retailsection">
+    <h2 class="retailsectionh2">Shop Anywhere Using Pagomigo!</h2>
+    <div class="retailsectiongrid">
+      <div class="retailitem">
+        <div class="retailimagecontainer">
+          <img src="newcoffeemaker.png" alt="coffee maker" class="coffeemaker" />
+        </div>
+      </div>
+      <div class="retailitem">
+        <div class="retailimagecontainer">
+          <img src="newdogbed.png" alt="Dog bed" class="dogbed" />
+        </div>
+      </div>
+      <div class="retailitem">
+        <div class="retailimagecontainer">
+          <img src="newsneakers.png" alt="sneakers" class="sneakers" />
+        </div>
+      </div>
+      <div class="retailitem">
+        <div class="retailimagecontainer">
+          <img src="newgameconsole.png" alt="gameconsole" class="gameconsole" />
+        </div>
+      </div>
+      <div class="retailitem">
+        <div class="retailimagecontainer">
+          <img src="newtires.png" alt="new tires" class="newtires" />
+        </div>
+      </div>
+      <div class="retailitem">
+        <div class="retailimagecontainer">
+          <img src="newwatch.png" alt="new watch" class="newwatch" />
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  
   <section class="debit-card-section">
     <div class="debit-card-grid">
       <!-- Left column: text -->
       <div class="debit-card-text">
         <h2>Use Your Pagomigo Debit Card Anywhere</h2>
-        <img src="pagomigovisacard.png" alt="pgomigo visa root" class="visa" />
+        <img src="pagomigodisplayimage.png" alt="pgomigo visa root" class="visa" />
         <p>Shop online or in-store, pay bills, and access your money instantly with your Pagomigo debit card. Your card is accepted wherever Mastercard or Visa is accepted.</p>
   
         <div class="features-list">
@@ -79,6 +132,28 @@
       </div>
     </div>
   </section>
+
+  <section class="features-section">
+    <h2 class="featuresh2">Features</h2>
+    <div class="features-grid">
+      <div class="feature-item">
+        <a href="moneymover.html"><img src="sendmoneyiphone.png" alt="Send Money Icon" /></a>
+        <h3>Send Money</h3>
+        <p>Send money to friends and family instantly, no matter where they are.</p>
+      </div>
+      <div class="feature-item">
+        <a href="moneymover.html"><img src="requestmoneyiphoneportrait.png" alt="Request Money Icon" /></a>
+        <h3>Request Money</h3>
+        <p>Request money from anyone, anywhere, with just a few taps.</p>
+      </div>
+      <div class="feature-item">
+        <a href="billpay.html"></a><img src="billpayportait.png" alt="Pay Bills Icon" /></a>
+        <h3>Pay Bills</h3>
+        <p>Pay your bills directly from your Pagomigo wallet, hassle-free.</p>
+      </div>
+    </div>
+  </section>
+
         <!-- Sign Up Modal -->
     <div id="signup-modal" class="modal-overlay">
       <div class="modal-content">
@@ -115,6 +190,6 @@
       <p>&copy; 2025 Pagomigo.com L.L.C. All rights reserved.</p>
     </div>
   </footer>
-   <script src="home.js"></script>
+   <script src="home.js" defer></script>
 </body>
 </html>
