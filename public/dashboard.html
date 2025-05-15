@@ -161,51 +161,69 @@
   </div>
 </section>
 
-<section class="page-header">
-  <h2 class="plaidh2">Connected Accounts</h2>
-  <p>Connect and manage your bank accounts securely with Plaid</p>
-
-
-<section class="accounts-section">
-      <div class="connect-account-button-container">
-        <button id="connect-bank-btn" class="primary-btn">
-          <img src="account_balance_24dp_000000_FILL0_wght400_GRAD0_opsz24.svg" alt="Bank" class="btn-icon">
-          Connect a Bank Account
-        </button>
-      </div>
-    
-      <!-- Messages -->
-      <div id="error-message" class="error-message hidden"></div>
-      <div id="success-message" class="success-message hidden"></div>
-    
-      <!-- No accounts message -->
-      <div id="no-accounts-message" class="no-account-container">
-        <h3>No Connected Accounts</h3>
-        <p>Connect your bank accounts to easily transfer money, check balances, and view transactions.</p>
-      </div>
-    
-      <!-- Connected accounts container -->
-      <div id="accounts-container" class="accounts-container hidden">
-        <h3>Your Connected Accounts</h3>
-        <ul id="accounts-list" class="accounts-list">
-          <!-- Accounts will be populated by JS -->
-        </ul>
-      </div>
-    </section>
-  </section>
-
-<!-- Transactions Section (Initially Hidden) -->
-<section id="transactions-section" class="transactions-section hidden">
+<!-- Plaid Banking Section (Add after your existing banking section) -->
+<section id="plaid-section" class="banking-section">
   <div class="section-header">
-    <h3 id="transactions-account-name">Transactions</h3>
-    <button id="close-transactions" class="close-btn">&times;</button>
+    <h3>Connected Bank Accounts</h3>
+    <div class="balance-info">
+      <span class="balance-label">Total Balance:</span>
+      <span id="plaid-total-balance" class="balance-amount">$0.00</span>
+    </div>
   </div>
-  <div class="transactions-list-container">
-    <ul id="transactions-list" class="transactions-list">
-      <!-- Transactions will be populated by JS -->
+  
+  <div class="banking-actions">
+    <button id="connect-bank-btn" class="banking-btn primary-btn">
+      <img src="account_balance_24dp_000000_FILL0_wght400_GRAD0_opsz24.svg" alt="Bank" class="btn-icon">
+      Connect Bank Account
+    </button>
+    <button id="view-transactions-btn" class="banking-btn secondary-btn">
+      <img src="receipt_long_FILL0_wght400_GRAD0_opsz24.svg" alt="Transactions" class="btn-icon">
+      View Transactions
+    </button>
+  </div>
+  
+  <!-- Messages -->
+  <div id="plaid-error-message" class="error-message hidden"></div>
+  <div id="plaid-success-message" class="success-message hidden"></div>
+  
+  <!-- No accounts message -->
+  <div id="no-plaid-accounts" class="no-account-container">
+    <h4>No Bank Accounts Connected</h4>
+    <p>Connect your bank accounts to easily track balances and transactions in one place.</p>
+  </div>
+  
+  <!-- Connected accounts container -->
+  <div id="plaid-accounts-container" class="accounts-container hidden">
+    <ul id="plaid-accounts-list" class="accounts-list">
+      <!-- Accounts will be populated by JS -->
     </ul>
   </div>
 </section>
+
+<!-- Plaid Transactions Panel (Initially Hidden) -->
+<div id="plaid-transactions-panel" class="action-panel hidden">
+  <div class="panel-header">
+    <h4>Recent Transactions</h4>
+    <button class="close-panel">&times;</button>
+  </div>
+  <div class="transactions-filter">
+    <select id="account-filter">
+      <option value="all">All Accounts</option>
+      <!-- Account options will be populated by JS -->
+    </select>
+    <select id="date-filter">
+      <option value="7">Last 7 days</option>
+      <option value="30" selected>Last 30 days</option>
+      <option value="90">Last 3 months</option>
+    </select>
+  </div>
+  <ul id="plaid-transactions-list" class="transactions-list">
+    <!-- Transactions will be populated by JS -->
+  </ul>
+  <div id="load-more-container" class="load-more-container hidden">
+    <button id="load-more-transactions" class="secondary-btn">Load More</button>
+  </div>
+</div>
 
 
   </main>
